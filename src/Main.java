@@ -13,7 +13,7 @@ class roomInventory {
       return roomAvailablity;
   }
 }
-
+//USE CASE 5
 class roomSearchService{
   void searchAvailableRooms(){
     roomInventory ob1 = new roomInventory();
