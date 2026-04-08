@@ -1,53 +1,112 @@
-
 import java.util.*;
-class roomInventory {
-  HashMap<String, Integer> roomAvailablity;
 
-  roomInventory() {
-    roomAvailablity = new HashMap<>();
-    roomAvailablity.put("Single", 5);
-    roomAvailablity.put("Double", 3);
-    roomAvailablity.put("Suite", 2);
-  }
-  HashMap<String, Integer> getRoomAvailablity () {
-      return roomAvailablity;
-  }
-}
-//USE CASE 5
-class roomSearchService{
-  void searchAvailableRooms(){
-    roomInventory ob1 = new roomInventory();
-    HashMap<String,Integer> availablity=ob1.getRoomAvailablity(); //Duplicate of main HashMap
-    for(String room:availablity.keySet()){ //Runs from 0th till end, keyset return key
-      if(availablity.get(room)>0) { // availablity.get("Single") returns the value =5 because availablity only has the key-value pair
-        if (room.equals("Single")) {
-          System.out.println("Single Room");
-          System.out.println("Beds: 1");
-          System.out.println("Size: 250 sqt");
-          System.out.println("Availble rooms: " + availablity.get(room));
-        }
-        else if (room.equals("Double")) {
-          System.out.println("Double Room");
-          System.out.println("Beds: 2");
-          System.out.println("Size: 500 sqt");
-          System.out.println("Availble rooms: " + availablity.get(room));
-        }
-        else if (room.equals("Suite")) {
-          System.out.println("Suite Room");
-          System.out.println("Beds: 3");
-          System.out.println("Size: 1000 sqt");
-          System.out.println("Availble rooms: " + availablity.get(room));
-        }
-      }
+// -------------------- Reservation Class --------------------
+class Reservation {
+    private String reservationId;
+    private String guestName;
+    private String roomType;
 
+    public Reservation(String reservationId, String guestName, String roomType) {
+        this.reservationId = reservationId;
+        this.guestName = guestName;
+        this.roomType = roomType;
     }
-  }
+
+    public String getReservationId() {
+        return reservationId;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
 }
+
+// -------------------- Add-On Service Class --------------------
+class AddOnService {
+    private String serviceName;
+    private double cost;
+
+    public AddOnService(String serviceName, double cost) {
+        this.serviceName = serviceName;
+        this.cost = cost;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+}
+
+// -------------------- Add-On Service Manager --------------------
+class AddOnServiceManager {
+
+    // Map: Reservation ID -> List of services
+    private Map<String, List<AddOnService>> servicesByReservation;
+
+    public AddOnServiceManager() {
+        servicesByReservation = new HashMap<>();
+    }
+
+    // Add service to a reservation
+    public void addService(String reservationId, AddOnService service) {
+        servicesByReservation.putIfAbsent(reservationId, new ArrayList<>());
+        servicesByReservation.get(reservationId).add(service);
+    }
+
+    // Get all services for a reservation
+    public List<AddOnService> getServices(String reservationId) {
+        return servicesByReservation.getOrDefault(reservationId, new ArrayList<>());
+    }
+
+    // Calculate total additional cost
+    public double calculateTotalCost(String reservationId) {
+        double total = 0;
+        List<AddOnService> services = servicesByReservation.get(reservationId);
+
+        if (services != null) {
+            for (AddOnService service : services) {
+                total += service.getCost();
+            }
+        }
+        return total;
+    }
+
+    // Display services
+    public void displayServices(String reservationId) {
+        List<AddOnService> services = getServices(reservationId);
+
+        System.out.println("Services for Reservation ID: " + reservationId);
+        for (AddOnService s : services) {
+            System.out.println("- " + s.getServiceName() + " : ₹" + s.getCost());
+        }
+
+        System.out.println("Total Add-On Cost: ₹" + calculateTotalCost(reservationId));
+    }
+}
+
+// -------------------- Main Class --------------------
 public class Main {
-  public static void main(String[] args) {
-    roomSearchService ob2= new roomSearchService();
-    ob2.searchAvailableRooms();
-  }
+    public static void main(String[] args) {
+
+        // Create reservation
+        Reservation r1 = new Reservation("R101", "Abhi", "Single");
+
+        // Create service manager
+        AddOnServiceManager manager = new AddOnServiceManager();
+
+        // Add services
+        manager.addService("R101", new AddOnService("Breakfast", 200));
+        manager.addService("R101", new AddOnService("Airport Pickup", 500));
+        manager.addService("R101", new AddOnService("Extra Bed", 300));
+
+        // Display services and cost
+        manager.displayServices("R101");
+    }
 }
-
-
